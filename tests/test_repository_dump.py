@@ -75,6 +75,23 @@ class DumpTests(unittest.TestCase):
         self.assertIsNone(redirect.get_header('Authorization'))
         self.assertFalse(mod.permitted_download('https://codeload.github.com.evil.test/o/r/zip/v1'))
 
+    def test_source_archive_request_uses_api_media_type(self):
+        class HeaderCheckingOpener:
+            def open(self, request, timeout):
+                if '/releases/assets/' in request.full_url:
+                    expected = 'application/octet-stream'
+                else:
+                    expected = 'application/vnd.github+json'
+                if request.get_header('Accept') != expected:
+                    from urllib.error import HTTPError
+                    raise HTTPError(request.full_url, 415, 'Unsupported Media Type', {}, None)
+                return Response()
+        client = mod.Client()
+        client.opener = HeaderCheckingOpener()
+        for endpoint in ('zipball/v1', 'tarball/v1', 'releases/assets/123'):
+            with client.open('https://api.github.com/repos/o/r/' + endpoint, binary=True) as response:
+                self.assertEqual(response.read(), b'example')
+
     def test_release_source_archives_are_saved_and_failure_is_incomplete(self):
         with tempfile.TemporaryDirectory() as tmp:
             client = StubClient()

@@ -1,0 +1,3 @@
+Synthetic attachment for a repository exporter validation.
+Marker: ARCHIVE_ATTACHMENT_20260913
+This file contains no customer data or credentials.

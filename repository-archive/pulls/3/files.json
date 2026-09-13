@@ -1,0 +1,14 @@
+[
+  {
+    "sha": "954cc2f168a4855bed343324dc05966b63920e9c",
+    "filename": "ARCHIVE_VALIDATION_FIXTURE.txt",
+    "status": "added",
+    "additions": 2,
+    "deletions": 0,
+    "changes": 2,
+    "blob_url": "https://github.com/alidonghao118-commits/THE-ERROR-IS-THE-MESSAGE/blob/75dd0ed52b137b779d898ce1b3c743668a6c37ca/ARCHIVE_VALIDATION_FIXTURE.txt",
+    "raw_url": "https://github.com/alidonghao118-commits/THE-ERROR-IS-THE-MESSAGE/raw/75dd0ed52b137b779d898ce1b3c743668a6c37ca/ARCHIVE_VALIDATION_FIXTURE.txt",
+    "contents_url": "https://api.github.com/repos/alidonghao118-commits/THE-ERROR-IS-THE-MESSAGE/contents/ARCHIVE_VALIDATION_FIXTURE.txt?ref=75dd0ed52b137b779d898ce1b3c743668a6c37ca",
+    "patch": "@@ -0,0 +1,2 @@\n+Synthetic PR fixture for archive preservation testing.\n+Marker: ARCHIVE_PR_FILE_20260913"
+  }
+]

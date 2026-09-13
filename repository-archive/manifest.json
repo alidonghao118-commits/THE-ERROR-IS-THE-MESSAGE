@@ -2,12 +2,20 @@
   "schema": 1,
   "repository": "alidonghao118-commits/THE-ERROR-IS-THE-MESSAGE",
   "started_scope": "All states: issues, issue/PR comments, PR reviews/inline comments/commits/files, releases/assets/source ZIP and TAR archives, tags, GitHub-uploaded attachments.",
-  "checked_at": "2026-09-13T11:12:25.117339+00:00",
+  "checked_at": "2026-09-13T12:10:34.892955+00:00",
   "complete": true,
   "counts": {
-    "issues-and-prs.json": 0,
-    "issue-comments.json": 0,
-    "pulls.json": 0,
+    "issues-and-prs.json": 4,
+    "issue-comments.json": 3,
+    "pulls.json": 2,
+    "pulls/3/reviews.json": 2,
+    "pulls/3/comments.json": 1,
+    "pulls/3/commits.json": 1,
+    "pulls/3/files.json": 1,
+    "pulls/4/reviews.json": 0,
+    "pulls/4/comments.json": 0,
+    "pulls/4/commits.json": 1,
+    "pulls/4/files.json": 1,
     "releases.json": 1,
     "tags.json": 1,
     "releases/387874142/assets.json": 0
@@ -31,6 +39,16 @@
       "content_type": "application/zip",
       "referenced_by": [
         "releases.json#387874142/zipball_url"
+      ]
+    },
+    "https://github.com/user-attachments/files/32160044/archive-fixture-20260913.txt": {
+      "path": "assets/194b0c459e5c15d2adad4964c3c1a33141e8a1c79a71470c107d3b73c90fb741.txt",
+      "original_name": "archive-fixture-20260913.txt",
+      "bytes": 147,
+      "sha256": "0f8a75d85d0f1b240f0fc6f452db6dcad4666bf8c9a7e530e7278087bb4e721b",
+      "content_type": "text/plain",
+      "referenced_by": [
+        "issue-comments.json"
       ]
     }
   },

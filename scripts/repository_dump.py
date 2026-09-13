@@ -46,7 +46,10 @@ class Client:
             raise ValueError('Not a GitHub HTTPS resource')
         headers = {'User-Agent': 'repository-dump/1.0'}
         if urlsplit(url).hostname == 'api.github.com':
-            headers.update({'Accept': 'application/octet-stream' if binary else 'application/vnd.github+json',
+            # Only uploaded release assets negotiate octet-stream. Source-archive
+            # endpoints expect the normal API media type before their redirect.
+            release_binary = binary and re.fullmatch(r'/repos/[^/]+/[^/]+/releases/assets/[0-9]+', urlsplit(url).path)
+            headers.update({'Accept': 'application/octet-stream' if release_binary else 'application/vnd.github+json',
                             'X-GitHub-Api-Version': '2022-11-28'})
             if self.token:
                 headers['Authorization'] = 'Bearer ' + self.token

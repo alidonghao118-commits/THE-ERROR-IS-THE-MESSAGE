@@ -96,6 +96,7 @@ def strings(value):
 
 def attachments(value):
     found = set()
+    asset_id = r'[0-9a-fA-F]{8}-(?:[0-9a-fA-F]{4}-){3}[0-9a-fA-F]{12}'
     for text in strings(value):
         for raw in re.findall(r'https://[^\s<>"`\u201c\u201d]+', html.unescape(text)):
             url = raw.rstrip(').,;!\'')
@@ -104,8 +105,13 @@ def attachments(value):
             except ValueError:
                 # Source code in PR diffs can contain incomplete URL expressions.
                 continue
-            if p.hostname == 'github.com' and (re.fullmatch(r'/user-attachments/(?:assets/[^/]+|files/[0-9]+/[^/]+)', p.path)
-                    or re.match(r'/[^/]+/[^/]+/files/', p.path)):
+            uploaded = p.hostname == 'github.com' and (
+                re.fullmatch(r'/user-attachments/assets/' + asset_id, p.path)
+                or re.fullmatch(r'/user-attachments/files/[0-9]+/[^/]+', p.path)
+                or re.fullmatch(r'/[^/]+/[^/]+/assets/[0-9]+/' + asset_id, p.path)
+                or re.fullmatch(r'/[^/]+/[^/]+/files/[0-9]+/[^/]+', p.path))
+            legacy_image = p.hostname == 'user-images.githubusercontent.com' and re.fullmatch(r'/[0-9]+/[^/]+', p.path)
+            if uploaded or legacy_image:
                 found.add(url)
     return found
 

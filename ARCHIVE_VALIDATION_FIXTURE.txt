@@ -1,0 +1,2 @@
+Synthetic PR fixture for archive preservation testing.
+Marker: ARCHIVE_PR_FILE_20260913

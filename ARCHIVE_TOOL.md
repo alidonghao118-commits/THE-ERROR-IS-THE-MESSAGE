@@ -19,6 +19,10 @@ can point to another public repository, which is useful for testing in a fork.
   Markdown links and bare upload URLs. An asset manifest links original URLs to
   local files and SHA-256 hashes. Repeated URLs download once; subsequent runs
   verify local files before reusing them.
+- Legacy repository-scoped asset links and `user-images.githubusercontent.com`
+  uploads are included. New-style asset IDs must have UUID form, so textual
+  placeholders such as `/assets/xxxx` are not treated as uploaded files; their
+  original text remains in the saved conversations.
 - A readable index and issue/PR conversation Markdown with comments and local attachment links.
   Raw JSON preserves the original text without rewriting.
 

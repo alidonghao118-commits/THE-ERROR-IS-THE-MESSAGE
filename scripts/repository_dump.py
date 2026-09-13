@@ -20,7 +20,7 @@ def permitted_download(url):
     p = urlsplit(url)
     host = p.hostname or ''
     return (p.scheme == 'https' and not p.username and not p.password
-            and p.port in (None, 443) and (host in ('github.com', 'api.github.com',
+            and p.port in (None, 443) and (host in ('github.com', 'api.github.com', 'codeload.github.com',
                 'github-production-user-asset-6210df.s3.amazonaws.com')
             or host.endswith('.githubusercontent.com')))
 
@@ -46,7 +46,10 @@ class Client:
             raise ValueError('Not a GitHub HTTPS resource')
         headers = {'User-Agent': 'repository-dump/1.0'}
         if urlsplit(url).hostname == 'api.github.com':
-            headers.update({'Accept': 'application/octet-stream' if binary else 'application/vnd.github+json',
+            # Only uploaded release assets negotiate octet-stream. Source-archive
+            # endpoints expect the normal API media type before their redirect.
+            release_binary = binary and re.fullmatch(r'/repos/[^/]+/[^/]+/releases/assets/[0-9]+', urlsplit(url).path)
+            headers.update({'Accept': 'application/octet-stream' if release_binary else 'application/vnd.github+json',
                             'X-GitHub-Api-Version': '2022-11-28'})
             if self.token:
                 headers['Authorization'] = 'Bearer ' + self.token
@@ -206,6 +209,10 @@ class Archive:
         self.collection('/tags', 'tags.json')
         for release in releases:
             rid = int(release['id'])
+            for field in ('zipball_url', 'tarball_url'):
+                url = release.get(field)
+                if url:
+                    self.refs.setdefault(url, []).append(f'releases.json#{rid}/{field}')
             assets = self.collection(f'/releases/{rid}/assets', f'releases/{rid}/assets.json')
             for asset in assets:
                 # API URL supports private release assets with the Actions token.
@@ -218,7 +225,7 @@ class Archive:
                       'assets': self.assets, 'failures': self.failures})
             print(f'Attachment {index}/{len(self.refs)}', flush=True)
         manifest = {'schema': 1, 'repository': self.repository,
-                    'started_scope': 'All states: issues, issue/PR comments, PR reviews/inline comments/commits/files, releases/assets, tags, GitHub-uploaded attachments.',
+                    'started_scope': 'All states: issues, issue/PR comments, PR reviews/inline comments/commits/files, releases/assets/source ZIP and TAR archives, tags, GitHub-uploaded attachments.',
                     'checked_at': datetime.now(timezone.utc).isoformat(), 'complete': not self.failures,
                     'counts': self.counts, 'assets': self.assets, 'failures': self.failures}
         save_json(self.output / 'manifest.json', manifest)

@@ -14,7 +14,9 @@ can point to another public repository, which is useful for testing in a fork.
 - Open and closed issues and PRs, including their original JSON bodies.
 - All issue comments (including PR conversation comments), PR reviews and inline
   review comments; PR commits and changed-file metadata.
-- Release notes, tags, release asset metadata, and downloaded release binaries.
+- Release notes, tags, release asset metadata, downloaded release binaries,
+  and each release's generated source ZIP and TAR archives. Source-archive
+  downloads use the same hash verification and failure reporting as uploads.
 - GitHub-uploaded attachments in these bodies/comments, including HTML images,
   Markdown links and bare upload URLs. An asset manifest links original URLs to
   local files and SHA-256 hashes. Repeated URLs download once; subsequent runs

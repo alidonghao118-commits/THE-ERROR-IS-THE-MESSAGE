@@ -1,16 +1,38 @@
 {
   "schema": 1,
   "repository": "alidonghao118-commits/THE-ERROR-IS-THE-MESSAGE",
-  "started_scope": "All states: issues, issue/PR comments, PR reviews/inline comments/commits/files, releases/assets, tags, GitHub-uploaded attachments.",
-  "checked_at": "2026-09-13T10:16:51.254951+00:00",
+  "started_scope": "All states: issues, issue/PR comments, PR reviews/inline comments/commits/files, releases/assets/source ZIP and TAR archives, tags, GitHub-uploaded attachments.",
+  "checked_at": "2026-09-13T11:12:25.117339+00:00",
   "complete": true,
   "counts": {
     "issues-and-prs.json": 0,
     "issue-comments.json": 0,
     "pulls.json": 0,
-    "releases.json": 0,
-    "tags.json": 0
+    "releases.json": 1,
+    "tags.json": 1,
+    "releases/387874142/assets.json": 0
   },
-  "assets": {},
+  "assets": {
+    "https://api.github.com/repos/alidonghao118-commits/THE-ERROR-IS-THE-MESSAGE/tarball/archive-workflow-validation-v1": {
+      "path": "assets/bf931da3cd5605fd76dd711ca9fa71598531d8bc10315fdee3252905806b61ba.bin",
+      "original_name": "archive-workflow-validation-v1",
+      "bytes": 39386191,
+      "sha256": "c9e032a83e5c076630760654cafbb3ebeab92682c221bf8f30059a16aee70ec8",
+      "content_type": "application/x-gzip",
+      "referenced_by": [
+        "releases.json#387874142/tarball_url"
+      ]
+    },
+    "https://api.github.com/repos/alidonghao118-commits/THE-ERROR-IS-THE-MESSAGE/zipball/archive-workflow-validation-v1": {
+      "path": "assets/785a2610822794e0f1701d37a0c439ecfbc1eed8c161083c6975efe9a1e3a832.zip",
+      "original_name": "archive-workflow-validation-v1",
+      "bytes": 39411405,
+      "sha256": "2fbe289ec5c820cc20b5c6bfa6fec3db11729d3dbdce1c05bc4b09518cb0111b",
+      "content_type": "application/zip",
+      "referenced_by": [
+        "releases.json#387874142/zipball_url"
+      ]
+    }
+  },
   "failures": []
 }

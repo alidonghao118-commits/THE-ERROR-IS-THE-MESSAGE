@@ -1,0 +1,57 @@
+name: Save repository conversations and attachments
+on:
+  workflow_dispatch:
+    inputs:
+      source_repository:
+        description: 'Optional source OWNER/REPO (leave blank for this repository)'
+        required: false
+        type: string
+
+permissions:
+  contents: write
+  issues: read
+  pull-requests: read
+
+concurrency:
+  group: repository-dump
+  cancel-in-progress: false
+
+jobs:
+  archive:
+    runs-on: ubuntu-latest
+    timeout-minutes: 60
+    steps:
+      - uses: actions/checkout@v4
+      - uses: actions/setup-python@v5
+        with:
+          python-version: '3.12'
+      - name: Run regression tests
+        run: python -m unittest discover -s tests -v
+      - name: Restore previous archive for deduplication
+        shell: bash
+        run: |
+          if git ls-remote --exit-code --heads origin repository-archive >/dev/null; then
+            git fetch origin repository-archive
+            git checkout FETCH_HEAD -- repository-archive
+          fi
+      - name: Export all conversations and uploaded assets
+        id: dump
+        continue-on-error: true
+        env:
+          GH_TOKEN: ${{ github.token }}
+          TARGET_REPOSITORY: ${{ inputs.source_repository || github.repository }}
+        run: python scripts/repository_dump.py --repository "$TARGET_REPOSITORY"
+      - name: Preserve a downloadable copy even on failure
+        if: always()
+        uses: actions/upload-artifact@v4
+        with:
+          name: repository-archive
+          path: repository-archive/
+          if-no-files-found: error
+          retention-days: 30
+      - name: Commit archive to its dedicated branch
+        if: steps.dump.outcome == 'success'
+        run: python scripts/publish_archive.py
+      - name: Fail visibly when export was incomplete
+        if: steps.dump.outcome != 'success'
+        run: exit 1

@@ -24,7 +24,7 @@ class StubClient:
     def pages(self, url):
         self.calls.append(url)
         if '/issues?' in url:
-            return [{'number': 1, 'title': 'closed issue', 'state': 'closed', 'body': '![asset](https://github.com/user-attachments/assets/example)'}]
+            return [{'number': 1, 'title': 'closed issue', 'state': 'closed', 'body': '![asset](https://github.com/user-attachments/assets/11111111-1111-4111-8111-111111111111)'}]
         if '/issues/comments?' in url:
             return [{'id': 3, 'issue_url': 'https://api.github.com/repos/o/r/issues/1', 'body': 'complete comment'}]
         if '/pulls?' in url:
@@ -69,14 +69,14 @@ class DumpTests(unittest.TestCase):
             mod.DownloadRedirect().redirect_request(request, None, 302, 'Found', {}, 'https://unrelated-bucket.s3.amazonaws.com/example')
 
     def test_uploaded_markdown_html_bare_and_legacy_links(self):
-        data = {'body': '![a](https://github.com/user-attachments/assets/a) <img src="https://github.com/user-attachments/assets/b" />\nhttps://github.com/o/r/files/55/a.pdf\nhttps://example.com/no.jpg'}
+        data = {'body': '![a](https://github.com/user-attachments/assets/aaaaaaaa-aaaa-4aaa-8aaa-aaaaaaaaaaaa) <img src="https://github.com/user-attachments/assets/bbbbbbbb-bbbb-4bbb-8bbb-bbbbbbbbbbbb" />\nhttps://github.com/o/r/files/55/a.pdf\nhttps://example.com/no.jpg'}
         self.assertEqual(len(mod.attachments(data)), 3)
 
     def test_url_code_fragments_do_not_discard_a_collection(self):
-        self.assertEqual(mod.attachments({'patch': 'url = https://[host\n![ok](https://github.com/user-attachments/assets/a)'}), {'https://github.com/user-attachments/assets/a'})
+        self.assertEqual(mod.attachments({'patch': 'url = https://[host\n![ok](https://github.com/user-attachments/assets/aaaaaaaa-aaaa-4aaa-8aaa-aaaaaaaaaaaa)'}), {'https://github.com/user-attachments/assets/aaaaaaaa-aaaa-4aaa-8aaa-aaaaaaaaaaaa'})
 
     def test_inline_code_delimiter_is_not_part_of_attachment_url(self):
-        url = 'https://github.com/user-attachments/assets/a'
+        url = 'https://github.com/user-attachments/assets/aaaaaaaa-aaaa-4aaa-8aaa-aaaaaaaaaaaa'
         self.assertEqual(mod.attachments('Download `' + url + '`.'), {url})
 
     def test_code_patch_and_upload_prefix_are_not_real_attachments(self):
@@ -87,6 +87,14 @@ class DumpTests(unittest.TestCase):
             archive = mod.Archive(client, 'o/r', tmp)
             archive.collection('/pulls/1/files', 'files.json')
             self.assertEqual(archive.refs, {})
+
+    def test_placeholder_asset_id_is_not_a_download(self):
+        self.assertEqual(mod.attachments('e.g. `https://github.com/user-attachments/assets/xxxx`'), set())
+
+    def test_legacy_uploaded_images_and_repo_assets(self):
+        urls = {'https://user-images.githubusercontent.com/123/456-example.png',
+                'https://github.com/o/r/assets/123/11111111-1111-4111-8111-111111111111'}
+        self.assertEqual(mod.attachments('\n'.join(urls)), urls)
 
     def test_all_conversations_release_assets_and_cached_rerun(self):
         with tempfile.TemporaryDirectory() as tmp:

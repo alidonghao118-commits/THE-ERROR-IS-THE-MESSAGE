@@ -68,6 +68,37 @@ class DumpTests(unittest.TestCase):
         with self.assertRaises(ValueError):
             mod.DownloadRedirect().redirect_request(request, None, 302, 'Found', {}, 'https://unrelated-bucket.s3.amazonaws.com/example')
 
+    def test_source_archive_redirect_strips_api_token(self):
+        from urllib.request import Request
+        request = Request('https://api.github.com/repos/o/r/zipball/v1', headers={'Authorization': 'Bearer example'})
+        redirect = mod.DownloadRedirect().redirect_request(request, None, 302, 'Found', {}, 'https://codeload.github.com/o/r/legacy.zip/v1')
+        self.assertIsNone(redirect.get_header('Authorization'))
+        self.assertFalse(mod.permitted_download('https://codeload.github.com.evil.test/o/r/zip/v1'))
+
+    def test_release_source_archives_are_saved_and_failure_is_incomplete(self):
+        with tempfile.TemporaryDirectory() as tmp:
+            client = StubClient()
+            original = client.pages
+            archives = {'zipball_url': 'https://api.github.com/repos/o/r/zipball/v1',
+                        'tarball_url': 'https://api.github.com/repos/o/r/tarball/v1'}
+            client.pages = lambda url: [dict(id=4, body='release', **archives)] if '/releases?' in url else original(url)
+            result = mod.Archive(client, 'o/r', tmp).run()
+            self.assertTrue(result['complete'])
+            for field, url in archives.items():
+                self.assertIn(url, result['assets'])
+                self.assertIn(f'releases.json#4/{field}', result['assets'][url]['referenced_by'])
+            self.assertEqual(client.downloads, 4)
+        with tempfile.TemporaryDirectory() as tmp:
+            original_open = client.open
+            def failed_source(url, binary=False):
+                if '/tarball/' in url:
+                    raise OSError('archive unavailable')
+                return original_open(url, binary)
+            client.open = failed_source
+            result = mod.Archive(client, 'o/r', tmp).run()
+            self.assertFalse(result['complete'])
+            self.assertTrue(any(f['resource'] == archives['tarball_url'] for f in result['failures']))
+
     def test_uploaded_markdown_html_bare_and_legacy_links(self):
         data = {'body': '![a](https://github.com/user-attachments/assets/aaaaaaaa-aaaa-4aaa-8aaa-aaaaaaaaaaaa) <img src="https://github.com/user-attachments/assets/bbbbbbbb-bbbb-4bbb-8bbb-bbbbbbbbbbbb" />\nhttps://github.com/o/r/files/55/a.pdf\nhttps://example.com/no.jpg'}
         self.assertEqual(len(mod.attachments(data)), 3)
